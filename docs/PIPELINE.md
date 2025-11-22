@@ -23,7 +23,7 @@ The following sections break down each stage.
 
 ### Sequence Diagram
 
-![Sequence Diagram](Diagrams/SequenceDiagram.png)
+![Sequence Diagram](/Diagrams/SequenceDiagram.png)
 
 ## 1. Repository Structure (Expected)
 
