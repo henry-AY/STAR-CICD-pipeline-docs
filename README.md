@@ -1,4 +1,4 @@
-# Automated Simulink Test Harness Runner (Python + MATLAB CI/CD Integration)
+# Simulink Test Automation Runner (STAR) / Git Simulink Automation Runner (G-STAR) Documentation
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python)
 ![Gitea](https://img.shields.io/badge/Gitea-Git%20Repository-blue?style=for-the-badge&logo=gitea)
