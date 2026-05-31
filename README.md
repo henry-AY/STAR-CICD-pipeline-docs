@@ -26,6 +26,8 @@
 | **Install Guide** | [`/docs-2/INSTALLATION.md`](/docs-2/INSTALLATION.md) | Systemd runner configuration, persistence, and service setup. |
 | **Config Guide** | [`/docs-2/CONFIG.md`](/docs-2/CONFIG.md) | Matrix variable injection and repository workspace tokens. |
 | **MATLAB Test Guide** | [`/docs-2/MATLAB.md`](/docs-2/MATLAB.md) | Headless background execution context (-batch). |
+| **Environment & Dependencies** | [`/docs-2/ENVIRONMENT.md`](/docs-2/ENVIRONMENT.md) | Enviornment and other dependency configuration. |
+| **YAML Setup** | [`/docs-2/YAML.md`](/docs-2/YAML.md) | YAML configuration for nightly builds. |
 | **Error Codes** | *See Section 2 Below* | Infrastructure errors, and exit codes. |
 
 ---
