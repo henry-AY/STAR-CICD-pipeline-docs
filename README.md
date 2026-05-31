@@ -1,4 +1,4 @@
-# Simulink Test Automation Runner (STAR) / Git Simulink Automation Runner (G-STAR) Documentation
+# Simulink Test Automation Runner (STAR / G-STAR)
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python)
 ![Gitea](https://img.shields.io/badge/Gitea-Git%20Repository-blue?style=for-the-badge&logo=gitea)
@@ -6,27 +6,65 @@
 ![Simulink](https://img.shields.io/badge/Simulink-Model%20Based%20Design-blue?style=for-the-badge&logo=mathworks)
 ![CI/CD](https://img.shields.io/badge/CI%2FCD-Automated%20Pipeline-green?style=for-the-badge&logo=githubactions)
 
-
 > [!IMPORTANT]
-This repository is currently being populated and will contain non-sensitive dummy data for the goal. Additionally, this repository will include heavy documentation.
+> This framework provides a unified Python-MATLAB integration ecosystem for executing Simulink Test Harnesses. It decouples core test orchestration from target functional models, enabling automatic subsystem validation via interactive local dashboards (**STAR**) or automated background CI/CD runners (**G-STAR**).
 
-This repository provides a Python-MATLAB integration framework for automating Simulink Test Harness execution in a continuous integration (CI/CD) pipeline. It enables automatic subsystem validation, test execution, and report generation, triggered by a scheduled CRON job or updates to the Git repository.
+---
 
-## Overview + Docs
+## Documentation Matrix
 
-This project orchestrates MATLAB Simulink Test Manager runs via Python automation scripts. It enables a headless testing workflow, where changes to subsystem folders automatically trigger MATLAB test harness execution, and results are logged for analysis.
+### STAR Architecture (Standalone System)
+| Document | Resource Path | Operational Focus |
+| :--- | :--- | :--- |
+| **Install Guide** | [`/docs/INSTALLATION.md`](/docs/INSTALLATION.md) | Local user workstation environment configuration. |
+| **Config Guide** | [`/docs/CONFIG.md`](/docs/CONFIG.md) | Standard JSON schema structures for local directory parsing. |
+| **CI/CD Flow** | [`/docs/PIPELINE.md`](/docs/PIPELINE.md) | Sequence logic mapping local execution loops. |
+| **MATLAB Test Guide** | [`/docs/MATLAB.md`](/docs/MATLAB.md) | Local Simulink Test Manager API interfaces. |
+| **Error Codes** | *See Section 1 Below* | Local execution exit codes and dashboard diagnostics. |
 
+### G-STAR Architecture (Git-Integrated Runner)
+| Document | Resource Path | Operational Focus |
+| :--- | :--- | :--- |
+| **Install Guide** | [`/docs-2/INSTALLATION.md`](/docs-2/INSTALLATION.md) | Systemd runner configuration, persistence, and service setup. |
+| **Config Guide** | [`/docs-2/CONFIG.md`](/docs-2/CONFIG.md) | Matrix variable injection and repository workspace tokens. |
+| **MATLAB Test Guide** | [`/docs-2/MATLAB.md`](/docs-2/MATLAB.md) | Headless background execution context (-batch). |
+| **Error Codes** | *See Section 2 Below* | Infrastructure errors, and exit codes. |
 
-<div align="center">
+---
 
-| Document | Link | Purpose |
-|---------|:----:|---------:|
-| Install Guide | [INSTALLATION.md](/docs/INSTALLATION.md) | Setup instructions |
-| Config Guide | [CONFIG.md](/docs/CONFIG.md) | How the JSON and paths work |
-| CI/CD Flow | [PIPELINE.md](/docs/PIPELINE.md) | High-level diagrams of project flow |
-| Environment & Dependencies | <> | List of required environment & dependencies |
-| MATLAB Test Runner Guide | [MATLAB.md](/docs/MATLAB.md) | High-level summary of Matlab tests |
-| Error Codes Reference | <> | Summary of possible Error-codes |
-| Local Debugging Guide | <> | Simple guide for common issues |
+## 1. STAR Error & Status Codes Reference Manual
 
-</div>
+STAR runs inside a local user context and displays execution states dynamically on the frontend web application dashboard.
+
+### Core Exit Codes Matrix
+
+| Exit Code | Enumerated Identity | Dashboard Status | Primary Root Cause & Diagnostic Action |
+| :---: | :--- | :--- | :--- |
+| **`0`** | `ENUM_PASSED` | <font color="green">**PASSED**</font> | All tests inside the subsystem's Test Suite executed and passed successfully. No action required. |
+| **`1`** | `ENUM_FAILED` | <font color="red">**FAILED**</font> | The tests executed successfully, but one or more simulation verification assertions failed (e.g., signal out of bounds). Inspect the `.mldatx` report. |
+| **`2`** | `ENUM_UNCHANGED` | <font color="gray">**UNCHANGED**</font> | Gitea hash matching layer detected no modifications to this subsystem directory since the last evaluation run. Execution bypassed to save resources. |
+| **`3`** | `ENUM_GITEA_ERROR` | <font color="orange">**ERROR**</font> | Local Git wrapper failed to contact the remote server or could not resolve upstream repository references during local sync. Check network/VPN connection. |
+| **`4`** | `ENUM_VALIDATION_ERROR` | <font color="cyan">**ERROR**</font> | The target subsystem directory structure violates architectural constraints. Typically triggered when a subsystem is missing its mandatory `TestSuites` folder (Returncode `-3`). |
+| **`5`** | `ENUM_TIMEOUT` | <font color="darkred">**TIMEOUT**</font> | The local MATLAB process stalled or exceeded its assigned maximum execution ceiling. Python forcefully killed the process thread to clear memory. |
+| **`98`** | `ENUM_PARSE_ERROR` | <font color="purple">**PARSE ERROR**</font> | Python failed to read or parse the resulting raw test logs or CSV summaries generated by MATLAB. Indicates structural formatting corruption. |
+| **`99`** | `ENUM_MATLAB_ERROR` | <font color="red">**CRASH**</font> | MATLAB encountered a critical unhandled script exception, engine failure, or license checkout failure prior to starting simulations. |
+| **`100`** | `ENUM_PYTHON_PROCESS_ERROR` | <font color="red">**CRITICAL**</font> | Subprocess invocation layer failed. Python was completely unable to spin up the background system worker thread. |
+| **`101`** | `ENUM_PYTHON_CRITICAL_ERROR`| <font color="red">**CRITICAL**</font> | Fatal configuration mismatch. Local settings JSON is either physically missing, corrupted, or contains illegible target file systems. |
+
+---
+
+## 2. G-STAR Error & Status Codes Reference Manual
+
+G-STAR executes in a headless background environment managed by `act_runner` and `systemd`. These errors show up directly in your Gitea Actions console output.
+
+### Core Exit Codes Matrix
+
+| Exit Code | Enumerated Identity | Runner Stage Impact | Primary Root Cause & Diagnostic Action |
+| :---: | :--- | :--- | :--- |
+| **`0`** | `ENUM_PASSED` | <font color="green">**Complete Job Success**</font> | Pipeline executed completely, all simulations passed, workspace cleaned up perfectly. |
+| **`1`** | `ENUM_FAILED` | <font color="orange">**Execute MATLAB Test (Fail)**</font> | Simulation tests completed, but functional software models failed verification criteria. Review the attached Gitea workflow workspace artifact files. |
+| **`5`** | `ENUM_MATLAB_TIMEOUT` | <font color="red">**Execute MATLAB Test (Terminated)**</font>| The Watchdog timer expired (default: 1200s). The `os.killpg()` group signal was fired, cleanly terminating the running instance of MATLAB to save server RAM. |
+| **`99`** | `ENUM_MATLAB_ERROR` | <font color="red">**Execute MATLAB Test (Crash)**</font> | MATLAB crashed midway through a headless sequence or encountered an internal toolbox segmentation fault. |
+| **`100`** | `ENUM_PYTHON_PROCESS_ERROR` | <font color="red">**Execute MATLAB Test (Aborted)**</font>| The background shell environment failed to spin up. Python subprocess tracking broken. |
+| **`101`** | `ENUM_PYTHON_CRITICAL_ERROR`| <font color="red">**Execute MATLAB Test (Aborted)**</font>| The runner cannot find the MATLAB binary. Occurs when the system daemon initializes a path context that misses the installation directory. |
+| **`130`** | `ENUM_USER_INTER` | <font color="gray">**Job Cancelled**</font> | A lab operator manually pressed the "Cancel Workflow" button inside the Gitea UI web portal, sending an external interrupt code. |
