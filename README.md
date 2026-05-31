@@ -9,8 +9,6 @@
 > [!IMPORTANT]
 > This framework provides a unified Python-MATLAB integration ecosystem for executing Simulink Test Harnesses. It decouples core test orchestration from target functional models, enabling automatic subsystem validation via interactive local dashboards (**STAR**) or automated background CI/CD runners (**G-STAR**).
 
----
-
 ## Documentation Matrix
 
 ### STAR Architecture (Standalone System)
@@ -51,7 +49,6 @@ STAR runs inside a local user context and displays execution states dynamically 
 | **`100`** | `ENUM_PYTHON_PROCESS_ERROR` | <font color="red">**CRITICAL**</font> | Subprocess invocation layer failed. Python was completely unable to spin up the background system worker thread. |
 | **`101`** | `ENUM_PYTHON_CRITICAL_ERROR`| <font color="red">**CRITICAL**</font> | Fatal configuration mismatch. Local settings JSON is either physically missing, corrupted, or contains illegible target file systems. |
 
----
 
 ## 2. G-STAR Error & Status Codes Reference Manual
 
